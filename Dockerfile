@@ -2,14 +2,14 @@ FROM ubuntu:14.04
 MAINTAINER Yugesh A "yugesh.a@tcs.com"
 
 RUN sudo apt-get update -y && sudo apt-get upgrade --fix-missing -y && \
-	sudo apt-get install software-properties-common -y && \
+	sudo apt-get install software-properties-common curl -y && \
 	sudo add-apt-repository ppa:webupd8team/java && \
 	sudo apt-get update -y
 
 # JDK INSTALLATION STARTS
 
-RUN echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections && \
-		sudo apt-get install oracle-java7-set-default oracle-java7-installer -y && \
+RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections && \
+		sudo apt-get install oracle-java8-set-default oracle-java8-installer -y && \
 		sudo apt-get install -f && \
 		sudo dpkg --configure -a
 		
@@ -41,7 +41,7 @@ RUN set -ex \
 	done
 
 ENV TOMCAT_MAJOR 8
-ENV TOMCAT_VERSION 8.0.32
+ENV TOMCAT_VERSION 8.0.33
 ENV TOMCAT_TGZ_URL https://www.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
 
 RUN set -x \
@@ -52,6 +52,8 @@ RUN set -x \
 	&& rm bin/*.bat \
 	&& rm tomcat.tar.gz*
 
+ADD tomcat-users.xml /opt/tomcat/conf/
+	
 # TOMCAT INSTALLATION ENDS
 
 # POSTGRES INSTALLATION STARTS
@@ -82,7 +84,7 @@ VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 # POSTGRESQL INSTALLATION ENDS
 	
 # Expose the ports we're interested in
-EXPOSE 8080 9990 5432
+EXPOSE 8009 8080 9990 5432
 
 # Set the default command to run on boot
 # This will boot WildFly in the standalone mode and bind to all interface
